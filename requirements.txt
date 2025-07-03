@@ -1,0 +1,13 @@
+streamlit==1.35.0
+pandas==2.2.2
+joblib==1.4.2
+scikit-learn==1.4.2
+deep-translator==1.11.4
+nltk==3.8.1
+regex==2024.5.10
+openpyxl==3.1.2
+matplotlib==3.8.4
+xgboost==2.0.3
+seaborn==0.13.2
+plotly==5.22.0
+wordcloud==1.9.3
