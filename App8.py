@@ -19,10 +19,6 @@ from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 from collections import Counter
 from PIL import Image
-
-#===========================================
-if "recent_reviews" not in st.session_state:
-    st.session_state["recent_reviews"] = []
 # ================================
 # Load dữ liệu và model
 # ================================
@@ -138,22 +134,21 @@ if st.session_state.active_tab == "Home":
 
     st.markdown("---")
 
-    #📌About Online Recruitment Website
-    st.subheader("💡 About Online Recruitment Website")
+    # 📌 About ITviec
+    st.subheader("💡 About ITviec")
     st.markdown("""
-    This project is based on reviews collected from **one of Vietnam’s leading online recruitment platforms** in the IT sector.  
-    The platform connects tech companies with skilled IT professionals and developers across Vietnam.  
-    📝 **Note**: The data used here is **dummy data** and is intended for **academic and research purposes only**.
+    **ITviec** is Vietnam's leading online recruitment platform, specializing in the Information Technology (IT) sector.  
+    Founded in 2013, ITviec connects tech companies with experienced developers and IT professionals.
     """)
 
     # 🎯 Project Scope
     st.subheader("🎯 Project Scope")
     st.markdown("""
-    This study uses employee review data to provide useful insights to companies.  
-    Using **Natural Language Processing (NLP)**, the system helps organizations understand:
-    - 😊 How satisfied employees are  
-    - ✅ What works well and what needs improvement  
-    - 👀 How the company appears to IT job seekers
+    This project uses reviews from ITviec to give useful information to partner companies.  
+    With Natural Language Processing (NLP), the system helps companies understand:
+    - How happy employees are  
+    - What is good and what needs to improve  
+    - How the company looks to IT job seekers
     """)
 
 
@@ -311,19 +306,19 @@ elif st.session_state.active_tab == "Dashboard":
         }
 
         topic_labels = {
-            0: "💸 Cluster 1: Compensation & Work Pressure",
-            1: "🛠️ Cluster 2: Project & Process",
-            2: "👥 Cluster 3: Team Culture & Leadership",
-            3: "🏢 Cluster 4: Training & Work-Life Balance",
-            4: "🌱 Cluster 5: Growth & Development Opportunities"
+            0: "💸 Cluster 1: Salary, Projects & Work Conditionss",
+            1: "👥 Cluster 2: Employee Experience & HR Policies",
+            2: "🏢 Cluster 3: Workspace, Overtime & Compensation",
+            3: "🌱 Cluster 4: Culture, Leadership & Growth",
+            4: "🚀 Cluster 5: Facilities, Flexibility & Growth"
         }
 
         cluster_recommendations = {
-            0: "💡 Pay more, reduce overtime, improve management & workspace.",
-            1: "💡 Streamline process, empower leaders, support team collaboration.",
-            2: "💡 Build positive culture, train kind leaders, retain good teams.",
-            3: "💡 Provide more training, promote work-life balance, enhance benefits.",
-            4: "💡 Offer growth paths, upskill employees, expand opportunities."
+            0: "💡 Review salary policy, manage project load, reduce overtime, and improve office environment",
+            1: "💡 Improve benefits, review policies, support employees, and build positive culture",
+            2: "💡 Improve workspace, reduce overtime, and offer better pay & benefits",
+            3: "💡 Build open culture, support career growth, and train good leaders",
+            4: "💡 Upgrade workspace, support learning, and expand employee benefits"
         }
 
         # ==== Lựa chọn lọc ====
@@ -382,7 +377,7 @@ elif st.session_state.active_tab == "Dashboard":
                     - 🔧 **Company type**: {company_info['Company Type']}
                     - 🏭 **Industry**: {company_info['Company industry']}
                     - 👥 **Size**: {company_info['Company size']}
-                    
+                    - 🌏 **Country**: {company_info['Country']}
                     - 📅 **Working days**: {company_info['Working days']}
                     - ⏱ **Overtime Policy**: {company_info['Overtime Policy']}
                     - ⭐ **Overall rating**: {company_info['Overall rating']}
@@ -483,33 +478,37 @@ elif st.session_state.active_tab == "Sentiment":
             st.success(f"✅ Sentiment predict ({model_choice}): **{labels[prediction]}**")
 
     with col_save:
-        # ✅ Khởi tạo session state nếu chưa có
-        if "recent_reviews" not in st.session_state:
-            st.session_state["recent_reviews"] = []
-        if st.button("💾 Save Review", help="Save your review"):
+        if st.button("💾 Save Review",help="Save your review"):
             if not selected_company_name:
                 st.error("❌ Please select a company before saving!")
             elif recommend == "---":
-                st.error("❌ Please select your recommendation for this company.")
+                st.error("❌ Please select your recomendation this company to others")
             else:
-                # ✅ Calculate average rating
                 avg_rating = round((salary + training + management + culture + workspace) / 5, 1)
                 now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-                # ✅ Create review record
                 review_record = {
-                    "🕒 Date time": now,
-                    "🏢 Company": selected_company_name,
-                    "⭐ Rating": avg_rating,
-                    "👍 Recommend?": recommend,
-                    "✍️ Review": review_text
+                    "id": selected_company_id,
+                    "Company Name": selected_company_name,
+                    "Cmt_day": now,
+                    "Rating": avg_rating,
+                    "Salary & benefits": salary,
+                    "Training & learning": training,
+                    "Management cares about me": management,
+                    "Culture & fun": culture,
+                    "Office & workspace": workspace,
+                    "review_text": review_text,
+                    "Recommend working here to a friend": recommend
                 }
 
-                # ✅ Update cache (only keep latest 3)
-                st.session_state.recent_reviews.insert(0, review_record)
-                st.session_state.recent_reviews = st.session_state.recent_reviews[:3]
+                output_path = "Reviews_User_Web.xlsx"
+                if os.path.exists(output_path):
+                    existing_df = pd.read_excel(output_path)
+                    updated_df = pd.concat([existing_df, pd.DataFrame([review_record])], ignore_index=True)
+                else:
+                    updated_df = pd.DataFrame([review_record])
 
-                st.success("✅ Your review has been saved!")
+                updated_df.to_excel(output_path, index=False)
+                st.success("📝 Your review has been saved in `Reviews_User_Web.xlsx`!")
 
     with col_info:
         if st.button("ℹ️ Company Infor.",help="Click to see company information"):
@@ -541,7 +540,7 @@ elif st.session_state.active_tab == "Sentiment":
                             <li>🔧 <strong>Type:</strong> {company_info['Company Type']}</li>
                             <li>🏭 <strong>Industry:</strong> {company_info['Company industry']}</li>
                             <li>👥 <strong>Size:</strong> {company_info['Company size']}</li>
-                            
+                            <li>🌍 <strong>Country:</strong> {company_info['Country']}</li>
                             <li>📅 <strong>Working days:</strong> {company_info['Working days']}</li>
                             <li>⏱ <strong>Overtime Policy:</strong> {company_info['Overtime Policy']}</li>
                             <li>⭐ <strong>Overall rating:</strong> {emoji} {company_info['Overall rating']}</li>
@@ -579,20 +578,20 @@ elif st.session_state.active_tab == "Sentiment":
 
                     # Mapping topic ID với nhãn ý nghĩa
                     topic_labels = {
-                        0: "💸 Cluster 1:  Compensation & Work Pressure",
-                        1: "🛠️ Cluster 2: Project & Process",
-                        2: "👥 Cluster 3: Team Culture & Leadership",
-                        3: "🏢 Cluster 4: Training & Work-Life Balance",
-                        4: "🌱 Cluster 5: Growth & Development Opportunities"
+                        0: "💸 Cluster 1:  Salary, Projects & Work Conditionss",
+                        1: "👥 Cluster 2: Employee Experience & HR Policies",
+                        2: "🏢 Cluster 3: Workspace, Overtime & Compensation",
+                        3: "🌱 Cluster 4: Culture, Leadership & Growth",
+                        4: "🚀 Cluster 5: Facilities, Flexibility & Growth"
                     }
 
                     # Gợi ý cải thiện theo cluster
                     cluster_recommendations = {
-                        0: "💡 Pay more, reduce overtime, improve management & workspace.",
-                        1: "💡 Streamline process, empower leaders, support team collaboration.",
-                        2: "💡 Build positive culture, train kind leaders, retain good teams.",
-                        3: "💡 Provide more training, promote work-life balance, enhance benefits.",
-                        4: "💡 Offer growth paths, upskill employees, expand opportunities."
+                        0: "💡 Review salary policy, manage project load, reduce overtime, and improve office environment",
+                        1: "💡 Improve benefits, review policies, support employees, and build positive culture",
+                        2: "💡 Improve workspace, reduce overtime, and offer better pay & benefits",
+                        3: "💡 Build open culture, support career growth, and train good leaders",
+                        4: "💡 Upgrade workspace, support learning, and expand employee benefits"
                     }
 
                     # Dự đoán phân phối topic
@@ -618,7 +617,23 @@ elif st.session_state.active_tab == "Sentiment":
                     st.error(f"❌ Error in clustering: {e}")
 
 # ✅ Hiển thị 10 review mới nhất
-if st.session_state["recent_reviews"]:
+    st.markdown("---")
     st.subheader("🧾 Recent reviews")
-    df = pd.DataFrame(st.session_state["recent_reviews"])
-    st.dataframe(df)
+
+    output_path = "Reviews_User_Web.xlsx"
+    if os.path.exists(output_path):
+        latest_reviews = pd.read_excel(output_path).sort_values(by="Cmt_day", ascending=False).head(10)
+
+        if "Recommend working here to a friend" not in latest_reviews.columns:
+            latest_reviews["Recommend working here to a friend"] = ""
+
+        st.dataframe(latest_reviews[[
+            "Cmt_day", "Company Name", "Rating",
+            "Recommend working here to a friend", "review_text"
+        ]].rename(columns={
+            "Cmt_day": "🕒 Date time",
+            "Company Name": "🏢 Company",
+            "Rating": "⭐ Rating",
+            "Recommend working here to a friend": "👍 Recommend?",
+            "review_text": "✍️ Review"
+        }))
