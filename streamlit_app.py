@@ -133,24 +133,23 @@ if st.session_state.active_tab == "Home":
         st.image(image, width=400)
 
     st.markdown("---")
-
-    # 📌 About ITviec
-    st.subheader("💡 About ITviec")
+    #📌About Online Recruitment Website
+    st.subheader("💡 About Online Recruitment Website")
     st.markdown("""
-    **ITviec** is Vietnam's leading online recruitment platform, specializing in the Information Technology (IT) sector.  
-    Founded in 2013, ITviec connects tech companies with experienced developers and IT professionals.
+    This project is based on reviews collected from **one of Vietnam’s leading online recruitment platforms** in the IT sector.  
+    The platform connects tech companies with skilled IT professionals and developers across Vietnam.  
+    📝 **Note**: The data used here is **dummy data** and is intended for **academic and research purposes only**.
     """)
 
     # 🎯 Project Scope
     st.subheader("🎯 Project Scope")
     st.markdown("""
-    This project uses reviews from ITviec to give useful information to partner companies.  
-    With Natural Language Processing (NLP), the system helps companies understand:
-    - How happy employees are  
-    - What is good and what needs to improve  
-    - How the company looks to IT job seekers
+    This study uses employee review data to provide useful insights to companies.  
+    Using **Natural Language Processing (NLP)**, the system helps organizations understand:
+    - 😊 How satisfied employees are  
+    - ✅ What works well and what needs improvement  
+    - 👀 How the company appears to IT job seekers
     """)
-
 
 # ================================
 # Tab 2: Dashboard
